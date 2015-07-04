@@ -28,11 +28,20 @@ Example small input (a Chinese material with strong characteristics, extracted f
 泡开再加热牛奶中杯大杯都是一个茶杯超大杯是两个茶包
 ```
 
-Tag extracted (with weights, 1-4 character for a word, weighting function: length * sqrt(length) * frequency):
+Tag extracted from the material above (with weights, 1-4 character for a word, weighting function: length * sqrt(length) * frequency):
 
 ```
 [('变成', 2), ('千万', 2), ('东西', 2), ('饮料', 2), ('行销', 2), ('个浓度', 2),
 ('味道', 2), ('意思', 2), ('默认', 2), ('到爆', 3), ('免费', 3), ('美式', 3),
 ('什么', 4), ('摩卡', 5), ('柠檬', 5), ('喜欢', 6), ('时候', 7), ('牛奶', 8),
 ('星巴克', 10), ('咖啡', 11), ('拿铁', 13)]
+```
+
+Tag extracted from the material above (with weights, 1-4 character for a word, weighting function: length * length * frequency, using large text as frequency dictionary):
+
+```
+[('默认', 2), ('行销', 2), ('饮料', 2), ('香草', 2), ('东西', 2), ('千万', 2),
+('卡布奇诺', 2), ('变成', 2), ('意思', 2), ('美式', 3), ('本周', 3), ('免费', 3),
+('什么', 4), ('摩卡', 5), ('可以', 5), ('柠檬', 5), ('喜欢', 6), ('时候', 7),
+('牛奶', 8), ('星巴克', 10), ('咖啡', 11), ('拿铁', 13)]
 ```
