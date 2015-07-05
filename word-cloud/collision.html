@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Word Clouds</title>
+    <script type="text/javascript" src="js/clouds.js" defer="defer"></script>
+    <script type="text/javascript" defer="defer">
+        var rx = 60, ry = 65, gx = 65, gy = 65;
+        var f_canvas, f_ctx, s_canvas, s_ctx;
+        var mouse_x, mouse_y, dragging = 0;
+
+        function draw() {
+            f_ctx.clearRect(0, 0, 100, 100);
+            f_ctx.beginPath();
+            f_ctx.arc(rx, ry, 10, 0, Math.PI * 2, false);
+            f_ctx.fillStyle = "#ff0000";
+            f_ctx.fill();
+
+            s_ctx.clearRect(0, 0, 100, 100);
+            s_ctx.beginPath();
+            s_ctx.arc(gx, gy, 10, 0, Math.PI * 2, false);
+            s_ctx.fillStyle = "#00ff00";
+            s_ctx.fill();
+        }
+
+        function test() {
+            var f_mask = Mask.newObjectFromPixels(
+                f_ctx.getImageData(0, 0, 100, 100).data,
+                100 * 4, 0, 0, 100, 100);
+            var s_mask = Mask.newObjectFromPixels(
+                s_ctx.getImageData(0, 0, 100, 100).data,
+                100 * 4, 0, 0, 100, 100);
+
+            if(f_mask.intersect(0, 0, s_mask))
+                document.getElementById("result").innerHTML =
+                    "intersected";
+            else
+                document.getElementById("result").innerHTML =
+                    "not intersected";
+        }
+
+        function mountListener() {
+            document.addEventListener("mouseup", function(e) {
+                dragging = 0;
+                test();
+            });
+            f_canvas.addEventListener("mousedown", function (e) {
+                dragging = 1;
+                mouse_x = e.clientX;
+                mouse_y = e.clientY;
+            });
+            s_canvas.addEventListener("mousedown", function (e) {
+                dragging = 2;
+                mouse_x = e.clientX;
+                mouse_y = e.clientY;
+            });
+            f_canvas.addEventListener("mousemove", function (e) {
+                if(dragging == 1) {
+                    rx += e.clientX - mouse_x;
+                    ry += e.clientY - mouse_y;
+                    mouse_x = e.clientX;
+                    mouse_y = e.clientY;
+                    draw();
+                }
+            });
+            s_canvas.addEventListener("mousemove", function (e) {
+                if(dragging == 2) {
+                    gx += e.clientX - mouse_x;
+                    gy += e.clientY - mouse_y;
+                    mouse_x = e.clientX;
+                    mouse_y = e.clientY;
+                    draw();
+                }
+            });
+        }
+
+        window.addEventListener("load", function () {
+            f_canvas = document.getElementById('first');
+            s_canvas = document.getElementById('second');
+            f_ctx = f_canvas.getContext('2d'),
+            s_ctx = s_canvas.getContext('2d');
+
+            draw();
+            test();
+            mountListener();
+        });
+    </script>
+</head>
+<body>
+<!--<canvas width="960" height="400" id="clouds"></canvas>-->
+<canvas width="100" height="100" style="border:1px solid #000" id="first">
+</canvas>
+<canvas width="100" height="100" style="border:1px solid #000" id="second">
+</canvas>
+<div id="result" style="width:100%"></div>
+</body>
+</html>
