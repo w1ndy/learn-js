@@ -5,24 +5,58 @@
     <script type="text/javascript" src="js/clouds.js" defer="defer"></script>
     <script type="text/javascript" defer="defer">
         var rx = 60, ry = 65, gx = 65, gy = 65;
-        var f_canvas, f_ctx, s_canvas, s_ctx;
-        var mouse_x, mouse_y, dragging = 0;
+        var f_canvas, f_ctx, s_canvas, s_ctx, vis_canvas, vis_ctx;
+        var mouse_x, mouse_y, dragging = 0, layer = 1;
 
         function draw() {
-            f_ctx.clearRect(0, 0, 100, 100);
-            f_ctx.beginPath();
-            f_ctx.arc(rx, ry, 10, 0, Math.PI * 2, false);
-            f_ctx.fillStyle = "#ff0000";
-            f_ctx.fill();
-
-            s_ctx.clearRect(0, 0, 100, 100);
-            s_ctx.beginPath();
-            s_ctx.arc(gx, gy, 10, 0, Math.PI * 2, false);
-            s_ctx.fillStyle = "#00ff00";
-            s_ctx.fill();
+            vis_ctx.clearRect(0, 0, 100, 100);
+            var drawer = {
+                red: function(fg) {
+                    if(fg)
+                       vis_ctx.fillStyle = "rgb(255, 0, 0)";
+                    else
+                       vis_ctx.fillStyle = "rgba(255, 0, 0, 0.7)";
+                    vis_ctx.font = "20px Helvetica"
+                    vis_ctx.fillText("RED", rx, ry);
+                    //vis_ctx.beginPath();
+                    //vis_ctx.arc(rx, ry, 10, 0, Math.PI * 2, false);
+                    //vis_ctx.fill();
+                },
+                green: function(fg) {
+                    if(fg)
+                        vis_ctx.fillStyle = "rgb(0, 255, 0)";
+                    else
+                        vis_ctx.fillStyle = "rgba(0, 255, 0, 0.7)";
+                    vis_ctx.font = "20px Helvetica"
+                    vis_ctx.fillText("GREEN", gx, gy);
+                    //vis_ctx.beginPath();
+                    //vis_ctx.arc(gx, gy, 10, 0, Math.PI * 2, false);
+                    //vis_ctx.fill();
+                }
+            };
+            switch(layer) {
+                case 1: drawer.green(); drawer.red(true); break;
+                case 2: drawer.red(); drawer.green(true); break;
+            }
         }
 
         function test() {
+            f_ctx.clearRect(0, 0, 100, 100);
+            f_ctx.font = "20px Helvetica"
+            f_ctx.fillText("RED", rx, ry);
+            // f_ctx.beginPath();
+            // f_ctx.arc(rx, ry, 10, 0, Math.PI * 2, false);
+            // f_ctx.fillStyle = "#ff0000";
+            // f_ctx.fill();
+
+            s_ctx.clearRect(0, 0, 100, 100);
+            s_ctx.font = "20px Helvetica"
+            s_ctx.fillText("GREEN", gx, gy);
+            // s_ctx.beginPath();
+            // s_ctx.arc(gx, gy, 10, 0, Math.PI * 2, false);
+            // s_ctx.fillStyle = "#00ff00";
+            // s_ctx.fill();
+
             var f_mask = Mask.newObjectFromPixels(
                 f_ctx.getImageData(0, 0, 100, 100).data,
                 100 * 4, 0, 0, 100, 100);
@@ -39,36 +73,46 @@
         }
 
         function mountListener() {
+            document.getElementById("switch").addEventListener("mouseup", function(e) {
+                    if(layer == 1) {
+                        layer = 2;
+                        this.innerHTML = "Switch to Layer Red";
+                    } else {
+                        layer = 1;
+                        this.innerHTML = "Switch to Layer Green";
+                    }
+                    draw();
+            });
             document.addEventListener("mouseup", function(e) {
                 dragging = 0;
                 test();
             });
-            f_canvas.addEventListener("mousedown", function (e) {
-                dragging = 1;
+            vis_canvas.addEventListener("mousedown", function (e) {
+                var rect = vis_canvas.getBoundingClientRect();
+                var x = e.clientX - rect.left,
+                    y = e.clientY - rect.top;
+                if(/*(x - gx) * (x - gx) + (y - gy) * (y - gy) <= 100 && */layer == 2)
+                    dragging = 2;
+                else if(/*(x - rx) * (x - rx) + (y - ry) * (y - ry) <= 100 && */layer == 1)
+                    dragging = 1;
                 mouse_x = e.clientX;
                 mouse_y = e.clientY;
             });
-            s_canvas.addEventListener("mousedown", function (e) {
-                dragging = 2;
-                mouse_x = e.clientX;
-                mouse_y = e.clientY;
-            });
-            f_canvas.addEventListener("mousemove", function (e) {
-                if(dragging == 1) {
-                    rx += e.clientX - mouse_x;
-                    ry += e.clientY - mouse_y;
-                    mouse_x = e.clientX;
-                    mouse_y = e.clientY;
-                    draw();
-                }
-            });
-            s_canvas.addEventListener("mousemove", function (e) {
-                if(dragging == 2) {
-                    gx += e.clientX - mouse_x;
-                    gy += e.clientY - mouse_y;
-                    mouse_x = e.clientX;
-                    mouse_y = e.clientY;
-                    draw();
+            vis_canvas.addEventListener("mousemove", function (e) {
+                switch(dragging) {
+                    case 1:
+                        rx += e.clientX - mouse_x;
+                        ry += e.clientY - mouse_y;
+                        mouse_x = e.clientX;
+                        mouse_y = e.clientY;
+                        draw();
+                        break;
+                    case 2:
+                        gx += e.clientX - mouse_x;
+                        gy += e.clientY - mouse_y;
+                        mouse_x = e.clientX;
+                        mouse_y = e.clientY;
+                        draw();
                 }
             });
         }
@@ -76,8 +120,10 @@
         window.addEventListener("load", function () {
             f_canvas = document.getElementById('first');
             s_canvas = document.getElementById('second');
+            vis_canvas = document.getElementById('vis');
             f_ctx = f_canvas.getContext('2d'),
             s_ctx = s_canvas.getContext('2d');
+            vis_ctx = vis_canvas.getContext('2d');
 
             draw();
             test();
@@ -87,10 +133,17 @@
 </head>
 <body>
 <!--<canvas width="960" height="400" id="clouds"></canvas>-->
-<canvas width="100" height="100" style="border:1px solid #000" id="first">
+<div style="float:left;margin-right:10px;">
+<canvas width="100" height="100" id="first" style="display:none">
 </canvas>
-<canvas width="100" height="100" style="border:1px solid #000" id="second">
+<canvas width="100" height="100" id="second" style="display:none">
 </canvas>
-<div id="result" style="width:100%"></div>
+<canvas width="100" height="100" style="border:1px solid #000" id="vis">
+</canvas>
+</div>
+<div style="">
+<button type="button" id="switch">Switch to Layer Green</button>
+<div id="result" style="margin-top:5px;"></div>
+</div>
 </body>
 </html>

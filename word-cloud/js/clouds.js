@@ -107,9 +107,9 @@ var Mask = {
                 //    js + "]=" + this.u32bString(this.mask[is][js]) +
                 //    " to dst[" + id + "," + jd + "]=" +
                 //    this.u32bString(dst.mask[id][jd]));
-                if((this.mask[is][js] >> src_shift) & dst.mask[id][jd])
+                if(src_shift < 32 && (this.mask[is][js] >> src_shift) & dst.mask[id][jd])
                     return true;
-                else if(jd != 0 &&
+                else if(dst_shift < 32 && jd != 0 &&
                         ((dst.mask[id][jd - 1] >> dst_shift) &
                             this.mask[is][js]))
                     return true;
