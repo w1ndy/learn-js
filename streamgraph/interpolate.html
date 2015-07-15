@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stream Graph</title>
+    <script type="text/javascript" src="js/math.min.js"></script>
+    <script type="text/javascript" src="js/stream.js"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+            canvas = document.getElementById("graph");
+            ctx = canvas.getContext("2d");
+            ctx.strokeStyle = "#000";
+            sample = bumpLayer(200);//[{x: 1.0, y: 1.0}, {x:2.0, y: 2.0}, {x:3.0, y:1.0}, {x:4.0, y:1.0}];
+            func = interpolate(sample);
+            console.log(func(1));
+            drawFunction(ctx, func, 0, 200, 2000, 0, 0, 4, 60);
+            //drawPoints(ctx, sample, 0, 0, 4, 60);
+            //drawFunction(ctx, function (x) { return x * x; }, -10, 10, 1000, 10, 1);
+        }
+    </script>
+</head>
+<body>
+<canvas id="graph" width="960" height="500" style="border: 1px solid #000000"></canvas>
+</body>
+</html>
